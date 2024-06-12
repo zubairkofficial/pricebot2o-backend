@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -8,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\adminUsers;
-
 use Illuminate\Support\Facades\Hash;
 
 class ApiAuthController extends Controller
@@ -17,13 +15,8 @@ class ApiAuthController extends Controller
     {
         // Validate input
         $request->validate([
-           
             'services' => 'required|array', // Ensure services is an array
         ]);
-    
-        // Log the raw services input and its type
-        // Log::info('Raw services input: ' . json_encode($request->input('services')));
-        // Log::info('Type of services input: ' . gettype($request->input('services')));
     
         $permissions = $request->input('services');
         Log::info('Permissions array: ' . json_encode($permissions));
@@ -53,46 +46,29 @@ class ApiAuthController extends Controller
             return response()->json(['error' => 'Provide proper details'], 400);
         }
     }
-    
+
     public function login2(Request $request)
-{
-    // Validate input
-    // $request->validate([
-    //     'email' => 'required|email',
-    //     'password' => 'required|string|min:6',
-    // ]);
+    {
+        $user = adminUsers::where('email', $request->email)->first();
 
-    // Retrieve the user by email
-    $user = adminUsers::where('email', $request->email)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        // If the user doesn't exist or the password is incorrect
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->plainTextToken;
+
+        Log::info('User successfully logged in: ' . $user->email);
+
+        return response()->json([
+            'message' => 'Successfully logged in!',
+            'accessToken' => $token,
+            'user' => $user,
+        ], 200);
     }
 
-    // Create a new personal access token
-    $tokenResult = $user->createToken('Personal Access Token');
-    $token = $tokenResult->plainTextToken;
-
-    // Log the successful login
-    Log::info('User successfully logged in: ' . $user->email);
-
-    // Return the access token and user information
-    return response()->json([
-        'message' => 'Successfully logged in!',
-        'accessToken' => $token,
-        'user' => $user,
-    ], 200);
-}
-    
     public function login(Request $request)
     {
-        // $request->validate([
-        //     'email' => 'required|string|email',
-        //     'password' => 'required|string',
-        //     'remember_me' => 'boolean'
-        // ]);
-
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
             return response()->json([
@@ -109,6 +85,7 @@ class ApiAuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -118,25 +95,20 @@ class ApiAuthController extends Controller
         ]);
     }
 
-
-    public function Getuser(){
+    public function Getuser()
+    {
         $user = adminUsers::all();
         return response()->json($user);
     }
 
-
     public function updateUser(Request $request, $id)
     {
-        // Validate input
         $request->validate([
-            
             'services' => 'sometimes|required|array', // Ensure services is an array
         ]);
 
-        // Find user by ID
         $user = adminUsers::findOrFail($id);
 
-        // Update user attributes
         if ($request->has('name')) {
             $user->name = $request->name;
         }
@@ -144,7 +116,7 @@ class ApiAuthController extends Controller
             $user->email = $request->email;
         }
         if ($request->has('password')) {
-            $user->password =  bcrypt($request->password);
+            $user->password = bcrypt($request->password);
         }
         if ($request->has('services')) {
             $user->services = $request->services;
@@ -152,34 +124,79 @@ class ApiAuthController extends Controller
 
         $user->save();
 
-        return response()->json(['message' => 'User updated successfully' , $user]);
+        return response()->json(['message' => 'User updated successfully', $user]);
     }
 
-
     public function getUserById($id)
-{
-    $user = adminUsers::findOrFail($id);
-    return response()->json($user);
-}
-
-
-
-public function delete($id)
     {
-        // Find the user by ID
+        $user = adminUsers::findOrFail($id);
+        return response()->json($user);
+    }
+
+    public function delete($id)
+    {
         $user = adminUsers::find($id);
 
-        // Check if user exists
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        // Delete the user
         $user->delete();
 
-        // Return success response
         return response()->json(['message' => 'User deleted successfully'], 200);
     }
 
+ 
+    
+
+
+    public function changePassword(Request $request, $id)
+{
+    // Validate request data
+    // $request->validate([
+    //     "email" => "required|email|unique:users,email,$id",
+    //     "password" => "required|string|min:6",
+    // ]);
+
+    // Find the user by ID
+    $user = adminUsers::find($id);
+
+    // Check if user exists
+    if (!$user) {
+        return response()->json([
+            'message' => 'User not found',
+        ], 404);
+    }
+
+    // Hash the password
+    $hashedPassword = Hash::make($request->password);
+
+    // Update the user's email and password
+    $user->email = $request->email;
+    $user->password = $hashedPassword;
+    $user->save();
+
+    // Return success response
+    return response()->json([
+        'message' => 'User updated successfully',
+        'user' => $user,
+    ]);
 }
 
+
+
+
+
+
+
+    public function getUserCredentials($id)
+    {
+        $user = adminUsers::findOrFail($id);
+
+
+        return response()->json([
+            'email' => $user->email,
+            'password' => $user->password, // This will be the hashed password
+        ]);
+    }
+}
