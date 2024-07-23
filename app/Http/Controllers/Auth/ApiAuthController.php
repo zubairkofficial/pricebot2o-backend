@@ -39,7 +39,7 @@ class ApiAuthController extends Controller
     
             return response()->json([
                 'message' => 'Successfully created user!',
-                'accessToken' => $token,
+                'token' => $token,
             ], 201);
         } else {
             Log::error('Failed to save user.');
@@ -62,7 +62,7 @@ class ApiAuthController extends Controller
 
         return response()->json([
             'message' => 'Successfully logged in!',
-            'accessToken' => $token,
+            'token' => $token,
             'user' => $user,
         ], 200);
     }
@@ -81,7 +81,7 @@ class ApiAuthController extends Controller
         $token = $tokenResult->plainTextToken;
 
         return response()->json([
-            'accessToken' => $token,
+            'token' => $token,
             'token_type' => 'Bearer',
         ]);
     }
