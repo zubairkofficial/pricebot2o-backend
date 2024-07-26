@@ -735,7 +735,7 @@ class VoiceController extends Controller
         }
 
         // If data exists, return it
-        return response()->json(['data' => $data], 200);
+        return response()->json($data, 200);
     }
 
 
