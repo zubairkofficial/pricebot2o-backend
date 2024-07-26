@@ -1,60 +1,56 @@
 <?php
 
-use App\Http\Controllers\Auth\ApiAuthController;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\VoiceController;
-use App\Http\Controllers\DepartmentController;
+use Illuminate\Support\Facades\Route;
 
-
-
-Route::post('/auth/login', [ApiAuthController::class, 'login'])->name('api_login');
-Route::post('/auth/login2', [ApiAuthController::class, 'login2'])->name('api_login2');
-Route::post('/auth/register', [ApiAuthController::class, 'register'])->name('api_register');
-Route::get('/auth/Getuser', [ApiAuthController::class, 'Getuser'])->name('Getuser');
-Route::post('/auth/updateUser/{id}', [ApiAuthController::class, 'updateUser']);
-Route::get('/auth/Getuser/{id}', [ApiAuthController::class, 'getUserById'])->name('getUserById');
-Route::delete('/auth/delete/{id}', [ApiAuthController::class, 'delete']);
-Route::post('/auth/changePassword/{id}', [ApiAuthController::class, 'changePassword']);
-Route::get('/auth/getUserCredentials/{id}', [ApiAuthController::class, 'getUserCredentials']);
-
-
-
-Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'user'], function () {
-    Route::post('logout', [ApiAuthController::class, 'logout']);
-    Route::post('/', function (Request $request) {
-        return User::find($request->id);
-    });
+// Auth Routes
+Route::prefix('auth')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
 });
 
+Route::group(['middleware' => 'auth:sanctum'], function () {
 
+    Route::post('changePassword/{id}', [AuthController::class, 'changePassword']);
+    Route::get('getuser/{id}', [AuthController::class, 'getuser']);
+    Route::post('updateUser/{id}', [AuthController::class, 'updateUser']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::delete('delete/{id}', [AuthController::class, 'delete']);
 
-// Voice  API 
-Route::post('/transcribe', [VoiceController::class, 'transcribe']);
-Route::get('/getSentEmails', [VoiceController::class, 'getSentEmails']);
-Route::get('/getemailId/{userId}', [VoiceController::class, 'getemailId']);
-Route::post('/sendEmail', [VoiceController::class, 'sendEmail']);
-Route::post('/sendEmail2', [VoiceController::class, 'sendEmail2']);
-Route::post('/sendResend', [VoiceController::class, 'sendResend']);
-Route::post('/generateSummary', [VoiceController::class, 'generateSummary']);
-Route::get('/getPromptFromDatabase', [VoiceController::class, 'getPromptFromDatabase']);
-Route::get('/getData', [VoiceController::class, 'getData']);
-Route::get('/getLatestNumber', [VoiceController::class, 'getLatestNumber']);
+    Route::get('dashboardInfo', [AdminController::class, 'dashboardInfo']);
 
+    // Service Routes
+    Route::get('all-services', [ServiceController::class, 'allServices']);
+    Route::get('active-services', [ServiceController::class, 'allActiveServices']);
+    Route::post('add-service', [ServiceController::class, 'addService']);
+    Route::post('update-service/{id}', [ServiceController::class, 'updateSerive']);
+    Route::get('get-service/{id}', [ServiceController::class, 'getService']);
+    Route::post('update-service-status/{id}', [ServiceController::class, 'updateSeriveStatus']);
 
+    // Voice  API
+    Route::post('/transcribe', [VoiceController::class, 'transcribe']);
+    Route::get('/getSentEmails', [VoiceController::class, 'getSentEmails']);
+    Route::get('/getemailId/{userId}', [VoiceController::class, 'getemailId']);
+    Route::post('/sendEmail', [VoiceController::class, 'sendEmail']);
+    Route::post('/sendEmail2', [VoiceController::class, 'sendEmail2']);
+    Route::post('/sendResend', [VoiceController::class, 'sendResend']);
+    Route::post('/generateSummary', [VoiceController::class, 'generateSummary']);
+    Route::get('/getPromptFromDatabase', [VoiceController::class, 'getPromptFromDatabase']);
+    Route::get('/getData', [VoiceController::class, 'getData']);
+    Route::get('/getLatestNumber', [VoiceController::class, 'getLatestNumber']);
 
+    // Department Controlller
+    Route::post('/CreateDepartment', [DepartmentController::class, 'CreateDepartment']);
+    Route::get('/GetDepartments', [DepartmentController::class, 'GetDepartments']);
+    Route::delete('/deleteDepartment/{departmentToDelete}', [DepartmentController::class, 'deleteDepartment']);
+    Route::get('/departments/{id}', [DepartmentController::class, 'getDepartmentById']);
+    Route::put('/UpdateDepartment/{id}', [DepartmentController::class, 'UpdateDepartment']);
+    Route::get('/getUserByIdd/{id}', [DepartmentController::class, 'getUserByIdd']);
 
-// Department Controlller 
-
-
-Route::post('/CreateDepartment', [DepartmentController::class, 'CreateDepartment']);
-Route::get('/GetDepartments', [DepartmentController::class, 'GetDepartments']);
-Route::delete('/deleteDepartment/{departmentToDelete}', [DepartmentController::class, 'deleteDepartment']);
-Route::get('/departments/{id}', [DepartmentController::class, 'getDepartmentById']);
-Route::put('/UpdateDepartment/{id}', [DepartmentController::class, 'UpdateDepartment']);
-Route::get('/getUserByIdd/{id}', [DepartmentController::class, 'getUserByIdd']);
-
-
-Route::post('/uploadFile' , [FileController::class , 'uploadFile' ]);
+    Route::post('/uploadFile', [FileController::class, 'uploadFile']);
+});

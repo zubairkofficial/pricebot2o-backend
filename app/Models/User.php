@@ -20,7 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'services'
+        'services',
+        'department'
     ];
 
     /**
@@ -41,6 +42,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'services' => 'array', // Cast services to array
+        'services' => 'array', 
+        'department' => 'array',
     ];
+
+    public function Services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
 }

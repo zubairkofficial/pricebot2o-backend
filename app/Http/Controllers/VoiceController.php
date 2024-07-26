@@ -340,8 +340,8 @@ class VoiceController extends Controller
             if (!empty($number)) {
                 GeneratedNumber::create([
                     'number' => $formattedNumber,
-                    'thema' => $thema,
-                    'datum' => $formattedDatum,
+                    'Thema' => $thema,
+                    'Datum' => $formattedDatum,
                     'Teilnehmer' => $TeilnehmerString,
                     'BM' => $BM,
                     'Niederlassungsleiter' => $Niederlassungsleiter,
@@ -533,8 +533,8 @@ class VoiceController extends Controller
         // Insert the generated data into the database, allowing for null values
         GeneratedNumber::create([
             'number' => $formattedNumber,
-            'thema' => $thema,
-            'datum' => $formattedDatum,
+            'Thema' => $thema,
+            'Datum' => $formattedDatum,
             'Teilnehmer' => $TeilnehmerString,
             'BM' => $BM,
             'Niederlassungsleiter' => $Niederlassungsleiter,
@@ -744,8 +744,7 @@ class VoiceController extends Controller
     public function getLatestNumber()
     {
         try {
-            return GeneratedNumber::orderBy('created_at', 'desc')
-                ->first(); // Retrieve the entire record
+            return GeneratedNumber::latest()->first(); // Retrieve the entire record
         } catch (\Exception $e) {
             Log::error('Error retrieving latest data from database: ' . $e->getMessage());
             return null;

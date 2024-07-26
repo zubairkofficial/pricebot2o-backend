@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('admin_users', function (Blueprint $table) {
-            $table->json('department')->nullable()->after('services'); 
+        Schema::create('services', function (Blueprint $table) {
+            $table->id();
+            $table->text('name');
+            $table->longText('description');
+            $table->text('link');
+            $table->integer('status')->default(1);
+            $table->timestamps();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('admin_users', function (Blueprint $table) {
-            $table->json('department'); 
-        });
+        Schema::dropIfExists('services');
     }
 };
