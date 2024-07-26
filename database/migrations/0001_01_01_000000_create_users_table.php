@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password');            
             $table->integer('user_type')->default(0);
             $table->json('services')->nullable();
-            $table->json('department')->nullable(); 
+            $table->string('organization')->nullable(); 
             $table->rememberToken();
             $table->timestamps();
         });

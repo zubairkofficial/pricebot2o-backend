@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ServiceController;
-use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\VoiceController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +32,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('get-service/{id}', [ServiceController::class, 'getService']);
     Route::post('update-service-status/{id}', [ServiceController::class, 'updateSeriveStatus']);
 
+    // Organization Routes
+    Route::get('all-orgs', [OrganizationController::class, 'allOrgs']);
+    Route::get('active-orgs', [OrganizationController::class, 'allActiveOrgs']);
+    Route::post('add-org', [OrganizationController::class, 'addOrg']);
+    Route::post('update-org/{id}', [OrganizationController::class, 'updateOrg']);
+    Route::get('get-org/{id}', [OrganizationController::class, 'getOrg']);
+    Route::post('update-org-status/{id}', [OrganizationController::class, 'updateOrgStatus']);
+
     // Voice  API
     Route::post('/transcribe', [VoiceController::class, 'transcribe']);
     Route::get('/getSentEmails', [VoiceController::class, 'getSentEmails']);
@@ -43,14 +51,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/getPromptFromDatabase', [VoiceController::class, 'getPromptFromDatabase']);
     Route::get('/getData', [VoiceController::class, 'getData']);
     Route::get('/getLatestNumber', [VoiceController::class, 'getLatestNumber']);
-
-    // Department Controlller
-    Route::post('/CreateDepartment', [DepartmentController::class, 'CreateDepartment']);
-    Route::get('/GetDepartments', [DepartmentController::class, 'GetDepartments']);
-    Route::delete('/deleteDepartment/{departmentToDelete}', [DepartmentController::class, 'deleteDepartment']);
-    Route::get('/departments/{id}', [DepartmentController::class, 'getDepartmentById']);
-    Route::put('/UpdateDepartment/{id}', [DepartmentController::class, 'UpdateDepartment']);
-    Route::get('/getUserByIdd/{id}', [DepartmentController::class, 'getUserByIdd']);
 
     Route::post('/uploadFile', [FileController::class, 'uploadFile']);
 });
