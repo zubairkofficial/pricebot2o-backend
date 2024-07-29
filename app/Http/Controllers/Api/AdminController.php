@@ -9,7 +9,7 @@ use App\Models\{User,Service};
 class AdminController extends Controller
 {
     public function dashboardInfo(){
-        $users = User::where('user_type', 0)->get();
+        $users = User::where('user_type', 0)->with('organization')->get();
         $services = Service::all()->keyBy('id');
 
         $users->each(function ($user) use ($services) {

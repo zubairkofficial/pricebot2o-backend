@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User,Service};
+use App\Models\{User,Service,Organization};
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,6 +24,9 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         if($request->services){
             $user->services = $request->services;
+        }
+        if($request->org_id){
+            $user->org_id = $request->org_id;
         }
         $user->save();
 
@@ -76,27 +79,27 @@ class AuthController extends Controller
         }
         $user->password = Hash::make($request->password);
         $user->save();
-    
+
         // Return success response
         return response()->json([
             'message' => 'Password updated successfully',
             'user' => $user,
         ]);
     }
-    
-    
+
+
     public function getuser($id){
-        $user = User::findOrFail($id);
+        $user = User::with('organization')->findOrFail($id);
         $services_ids = Service::all()->keyBy('id');
         $services = Service::all();
-
+        $orgs = Organization::all();
         if ($user->services) {
             $user->service_names = collect($user->services)->map(function ($serviceId) use ($services_ids) {
                 return $services_ids->get($serviceId)->name ?? '';
             })->toArray();
         }
 
-        return response()->json(['user' => $user, 'services' => $services], 200);
+        return response()->json(['user' => $user, 'services' => $services, 'orgs' => $orgs], 200);
     }
 
     public function updateUser(Request $request, $id)
@@ -119,15 +122,15 @@ class AuthController extends Controller
         if ($request->has('services')) {
             $user->services = $request->services;
         }
-        if ($request->has('department')) {
-            $user->department = $request->department;
+        if($request->has('org_id')){
+            $user->org_id = $request->org_id;
         }
 
         $user->save();
 
         return response()->json(['message' => 'User updated successfully', $user]);
     }
-    
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -137,7 +140,7 @@ class AuthController extends Controller
         ]);
     }
 
-    
+
     public function delete($id)
     {
         $user = User::find($id);

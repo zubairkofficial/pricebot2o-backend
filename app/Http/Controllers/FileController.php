@@ -21,21 +21,21 @@ class FileController extends Controller
         //     'document' => 'required|file',
         //     'fileName' => 'required|string',
         // ]);
-    
+
         // Retrieve the uploaded file and file name
         $file = $request->file('document');
         $fileName = $request->input('fileName');
-    
+
         // API URL
         $url = 'https://dhn.services/sthamer/datasheet_process';
-    
+
         // Static credentials
         $username = 'api_user';
         $password = 'g*f>G31B=9D7';
-    
-        // Create a Guzzle client   
+
+        // Create a Guzzle client
         $client = new Client();
-    
+
         try {
             // Make the POST request with Basic Auth and multipart/form-data
             $response = $client->post($url, [
@@ -56,19 +56,19 @@ class FileController extends Controller
                     ],
                 ],
             ]);
-    
+
             // Check the status code for success
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                 // Get the response body
                 $responseData = json_decode($response->getBody(), true);
-    
+
                 // Save the file data and file name to the database
-                DB::table('document')->insert([
+                Document::create([
                     'file_name' => $fileName,
                     'data' => json_encode($responseData), // Ensure data is encoded if it's JSON
-                   
+
                 ]);
-    
+
                 // Return a successful response with the data
                 return response()->json(['message' => 'File uploaded and saved successfully', 'data' => $responseData]);
             } else {
@@ -80,8 +80,8 @@ class FileController extends Controller
             $errorResponse = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
             return response()->json(['message' => 'Failed to upload file', 'error' => $errorResponse], $e->getCode() ?: 400);
         }
-    
-    
-    
+
+
+
 }
 }

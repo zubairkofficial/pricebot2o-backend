@@ -5,11 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Document extends Model // Make sure the class name is correct
+class Document extends Model
 {
     use HasFactory;
-
-    protected $table = 'document'; 
 
     /**
      * The attributes that are mass assignable.
@@ -17,8 +15,8 @@ class Document extends Model // Make sure the class name is correct
      * @var array<int, string>
      */
     protected $fillable = [
-        'file_name',  // Allow mass assignment for file_name
-        'data',       // Allow mass assignment for data
+        'file_name',
+        'data',
     ];
 
     /**
@@ -27,6 +25,6 @@ class Document extends Model // Make sure the class name is correct
      * @var array
      */
     protected $casts = [
-        'data' => 'array', // If 'data' is used to store JSON
+        'data' => 'array',
     ];
 }

@@ -45,10 +45,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/getSentEmails', [VoiceController::class, 'getSentEmails']);
     Route::get('/getemailId/{userId}', [VoiceController::class, 'getemailId']);
     Route::post('/sendEmail', [VoiceController::class, 'sendEmail']);
-    Route::post('/sendEmail2', [VoiceController::class, 'sendEmail2']);
     Route::post('/sendResend', [VoiceController::class, 'sendResend']);
     Route::post('/generateSummary', [VoiceController::class, 'generateSummary']);
-    Route::get('/getPromptFromDatabase', [VoiceController::class, 'getPromptFromDatabase']);
     Route::get('/getData', [VoiceController::class, 'getData']);
     Route::get('/getLatestNumber', [VoiceController::class, 'getLatestNumber']);
 

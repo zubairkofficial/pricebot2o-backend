@@ -21,7 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'services',
-        'department'
+        'org_id'
     ];
 
     /**
@@ -42,13 +42,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'services' => 'array', 
-        'department' => 'array',
+        'services' => 'array',
     ];
 
-    public function Services()
+    public function organization()
     {
-        return $this->hasMany(Service::class);
+        return $this->hasOne(Organization::class,'id','org_id');
     }
 
 }
