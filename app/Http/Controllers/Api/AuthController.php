@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\{User,Service,Organization};
+
+use App\Models\Organization;
+
+use App\Models\Service;
+use App\Models\User;use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,10 +25,10 @@ class AuthController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        if($request->services){
+        if ($request->services) {
             $user->services = $request->services;
         }
-        if($request->org_id){
+        if ($request->org_id) {
             $user->org_id = $request->org_id;
         }
         $user->save();
@@ -48,13 +51,13 @@ class AuthController extends Controller
         $password = $request->password;
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
             // if (Auth::user()->hasVerifiedEmail()) {
-                $user = Auth::user();
-                $token = $user->createToken('user_token')->plainTextToken;
-                return response()->json([
-                    "message" => "Logged in successfully",
-                    "user" => $user,
-                    "token" => $token,
-                ], 200);
+            $user = Auth::user();
+            $token = $user->createToken('user_token')->plainTextToken;
+            return response()->json([
+                "message" => "Logged in successfully",
+                "user" => $user,
+                "token" => $token,
+            ], 200);
             // } else {
             //     return response()->json(["message" => "Your email is not verified."], 422);
             // }
@@ -63,32 +66,30 @@ class AuthController extends Controller
         }
     }
 
-    public function changePassword(Request $request, $id)
+    public function changePassword(Request $request)
     {
         $request->validate([
+            'old_password' => 'required',
             'password' => 'required|min:8|confirmed',
         ]);
+        $user = Auth::user();
 
-        $user = User::find($id);
+        if (Hash::check($request->input('old_password'), $user->password)) {
+            $user->password = Hash::make($request->password);
+            $user->save();
 
-        // Check if user exists
-        if (!$user) {
             return response()->json([
-                'message' => 'User not found',
-            ], 404);
+                'message' => 'Password changed successfully',
+                'user' => $user,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Invalid Old password.'], 400);
         }
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        // Return success response
-        return response()->json([
-            'message' => 'Password updated successfully',
-            'user' => $user,
-        ]);
     }
 
-
-    public function getuser($id){
+    public function getuser($id)
+    {
         $user = User::with('organization')->findOrFail($id);
         $services_ids = Service::all()->keyBy('id');
         $services = Service::all();
@@ -122,7 +123,7 @@ class AuthController extends Controller
         if ($request->has('services')) {
             $user->services = $request->services;
         }
-        if($request->has('org_id')){
+        if ($request->has('org_id')) {
             $user->org_id = $request->org_id;
         }
 
@@ -136,10 +137,9 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
 
         return response()->json([
-            'message' => 'Successfully logged out'
+            'message' => 'Successfully logged out',
         ]);
     }
-
 
     public function delete($id)
     {
@@ -153,6 +153,5 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'User deleted successfully'], 200);
     }
-
 
 }
