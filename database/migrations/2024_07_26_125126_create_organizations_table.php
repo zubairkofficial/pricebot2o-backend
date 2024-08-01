@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name')->nullable(); 
             $table->string('street')->nullable(); 
             $table->longtext('prompt')->nullable();
-            $table->string('status')->default(1);
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }
