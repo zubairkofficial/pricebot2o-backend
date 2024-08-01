@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -9,11 +10,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Document;
 use Illuminate\Support\Facades\DB;
 
-
-
 class FileController extends Controller
 {
-    //
     public function uploadFile(Request $request)
     {
         // Validate the request to ensure a file and file name are provided
@@ -81,7 +79,5 @@ class FileController extends Controller
             return response()->json(['message' => 'Failed to upload file', 'error' => $errorResponse], $e->getCode() ?: 400);
         }
 
-
-
-}
+    }
 }

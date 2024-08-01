@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-
 use Illuminate\Support\Facades\Mail;
-use App\Mail\Transcrip;
+use App\Mail\TranscripMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -286,7 +285,7 @@ class VoiceController extends Controller
             ]);
 
             // Send email
-            Mail::to($data['email'])->send(new Transcrip($data));
+            Mail::to($data['email'])->send(new TranscripMail($data));
 
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {
@@ -316,7 +315,7 @@ class VoiceController extends Controller
 
         try {
             // Send email
-            Mail::to($data['email'])->send(new Transcrip($data));
+            Mail::to($data['email'])->send(new TranscripMail($data));
 
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {

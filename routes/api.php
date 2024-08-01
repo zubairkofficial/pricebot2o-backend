@@ -4,8 +4,8 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\OrganizationController;
-use App\Http\Controllers\FileController;
-use App\Http\Controllers\VoiceController;
+use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\VoiceController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
