@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\OrganizationController;
+use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\VoiceController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('update-org/{id}', [OrganizationController::class, 'updateOrg']);
     Route::get('get-org/{id}', [OrganizationController::class, 'getOrg']);
     Route::post('update-org-status/{id}', [OrganizationController::class, 'updateOrgStatus']);
+
+    // Translation Routes
+    Route::get('all-trans', [TranslationController::class, 'allTrans']);
+    Route::post('add-trans', [TranslationController::class, 'addTrans']);
+    Route::post('update-trans/{id}', [TranslationController::class, 'updateTrans']);
+    Route::get('get-trans/{id}', [TranslationController::class, 'getTrans']);
 
     // Voice  API
     Route::post('/transcribe', [VoiceController::class, 'transcribe']);

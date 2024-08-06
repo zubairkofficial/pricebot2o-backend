@@ -10,12 +10,8 @@
 <body>
     <h1>Transkriptions-E-Mail</h1>
 
-    <!-- Profilbild -->
     <img src="https://pricebot.martinmobiles.com/assets/logo.jpeg" alt="Profilbild" style="width: 100px; height: 100px; border-radius: 50%;">
-{{-- 
-    <p>Liebe/r {{ $data['name'] }},</p>
-    <p>Titel: {{ $data['title'] }}</p> --}}
-    
+
     @if(isset($data['transcriptionText']))
     <p>Hier ist der Transkriptionstext:</p>
     <p>{{ $data['transcriptionText'] }}</p>
@@ -29,7 +25,7 @@
     @endif
     
     @if(isset($data['summary']))
-    <br> <!-- Add an empty line for gap -->
+    <br>
     <br>
     <br>
     <p>Zusammenfassung:</p>
@@ -38,7 +34,6 @@
     @endif
 
     <p>Vielen Dank,</p>
-    <!-- <p>PriceBot</p> -->
 </body>
 
 </html>

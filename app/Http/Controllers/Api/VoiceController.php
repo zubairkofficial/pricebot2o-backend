@@ -206,19 +206,19 @@ class VoiceController extends Controller
         $datum = $numberResponse['date'] ?? null;
         $formattedDatum = $datum ? date('d-m-y', strtotime(str_replace('.', '-', $datum))) : null;
         $number = $numberResponse['shareholder'] ?? null;
-        $formattedNumber = $number ? str_replace('.', '', $number) : null;
+        // $formattedNumber = $number ? str_replace('.', '', $number) : null;
         $Teilnehmer = $numberResponse['participant'] ?? null;
-        $BM = $numberResponse['branch_manager'] ?? null;
+        // $BM = $numberResponse['branch_manager'] ?? null;
         $totalTokens = $body['usage']['total_tokens'] ?? null;
 
         $TeilnehmerString = is_array($Teilnehmer) ? implode(', ', $Teilnehmer) : $Teilnehmer;
 
         GeneratedNumber::create([
-            'number' => $formattedNumber,
+            // 'number' => $formattedNumber,
             'Thema' => $thema,
             'Datum' => $formattedDatum,
             'Teilnehmer' => $TeilnehmerString,
-            'BM' => $BM,
+            // 'BM' => $BM,
             'Niederlassungsleiter' => $Niederlassungsleiter,
         ]);
 
@@ -253,33 +253,23 @@ class VoiceController extends Controller
     public function sendEmail(Request $request)
     {
         $data = [
-            // 'title' => $request->input('title'),
             'email' => $request->input('email'),
-            // 'name' => $request->input('name'),
             'transcriptionText' => $request->input('transcriptionText'),
             'listeningText' => $request->input('listeningText'),
-
-
             'summary' => $request->input('summary'),
             'date' => $request->input('date'),
             'theme' => $request->input('theme'),
-            'partnerNumber' => $request->input('partnerNumber'),
-            'branchManager' => $request->input('branchManager'),
             'participants' => $request->input('participants'),
             'author' => $request->input('author'),
         ];
 
         try {
             Email::create([
-                // 'title' => $data['title'],
                 'email' => $data['email'],
-                // 'name' => $data['name'],
                 'transcriptionText' => $data['transcriptionText'],
                 'summary' => $data['summary'],
                 'date' => $data['date'],
                 'theme' => $data['theme'],
-                'partnerNumber' => $data['partnerNumber'],
-                'branchManager' => $data['branchManager'],
                 'participants' => $data['participants'],
                 'author' => $data['author'],
             ]);

@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Organization;
 
 use App\Models\Service;
-use App\Models\User;use Illuminate\Http\Request;
+use App\Models\{User,Translation};
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -49,6 +50,7 @@ class AuthController extends Controller
         ]);
         $email = $request->email;
         $password = $request->password;
+        $translations = Translation::all();
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
             // if (Auth::user()->hasVerifiedEmail()) {
             $user = Auth::user();
@@ -57,6 +59,7 @@ class AuthController extends Controller
                 "message" => "Logged in successfully",
                 "user" => $user,
                 "token" => $token,
+                "translationData" => $translations,
             ], 200);
             // } else {
             //     return response()->json(["message" => "Your email is not verified."], 422);
