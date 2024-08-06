@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-use App\Models\{Email,Organization,GeneratedNumber};
+use App\Models\{Email, Organization, GeneratedNumber};
 
 
 class VoiceController extends Controller
