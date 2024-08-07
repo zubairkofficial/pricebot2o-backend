@@ -109,7 +109,7 @@ class AuthController extends Controller
     public function updateUser(Request $request, $id)
     {
         $request->validate([
-            'services' => 'sometimes|array', // Ensure services is an array
+            'services' => 'sometimes|array', 
         ]);
 
         $user = User::findOrFail($id);

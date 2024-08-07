@@ -15,6 +15,8 @@ Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
 });
 
+Route::get('get-trans', [TranslationController::class, 'allTrans']);
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('change-password', [AuthController::class, 'changePassword']);
