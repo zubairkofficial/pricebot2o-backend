@@ -65,7 +65,7 @@ class AuthController extends Controller
             //     return response()->json(["message" => "Your email is not verified."], 422);
             // }
         } else {
-            return response()->json(["message" => "Invalid email or password"], 422);
+            return response()->json(["message" => "invalid_email_or_password"], 422);
         }
     }
 
