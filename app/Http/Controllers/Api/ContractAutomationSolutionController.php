@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
 use App\Models\ContractSolutions;
 
 class ContractAutomationSolutionController extends Controller
@@ -14,7 +16,7 @@ class ContractAutomationSolutionController extends Controller
     public function fetchContractAutomation(Request $request)
     {
         // Increase maximum execution time
-        set_time_limit(300);
+        set_time_limit(600); // 10 minutes
 
         // Validate that the document and doctype are present in the request
         $validated = $request->validate([
@@ -26,11 +28,6 @@ class ContractAutomationSolutionController extends Controller
         $doctype = $validated['doctype'];
         $fileName = $file->getClientOriginalName();
 
-        // Log::info('Request Data:', $validated);
-        // Log::info('File Path: ' . $file->getPathname());
-        // Log::info('File Mime Type: ' . $file->getMimeType());
-        // Log::info('File Original Name: ' . $fileName);
-
         // API URL
         $url = 'https://dhn.services/contract_automation';
 
@@ -40,10 +37,12 @@ class ContractAutomationSolutionController extends Controller
 
         // Create a Guzzle client with increased timeout
         $client = new Client([
-            'timeout' => 300,
-        ]);
+            'timeout' => 600,
+       ]);
 
         try {
+            $startTime = microtime(true);
+
             $response = $client->post($url, [
                 'auth' => [$username, $password],
                 'multipart' => [
@@ -67,20 +66,88 @@ class ContractAutomationSolutionController extends Controller
                 ],
             ]);
 
-            $responseBody = $response->getBody()->getContents();
-            Log::info('Raw Response: ' . substr($responseBody, 0, 300) . '...');
+            $endTime = microtime(true);
+            // Log::info("Request completed in " . ($endTime - $startTime) . " seconds.");
 
-            // Save the raw response to the database
+            // Get and process the response
+            $responseBody = $response->getBody()->getContents();
+            $contentType = $response->getHeader('Content-Type')[0];
+
+            if (strpos($contentType, 'application/json') !== false) {
+                $responseText = $this->processResponse($responseBody);
+            } else {
+                $responseText = 'The response is in a binary format and cannot be displayed as text.';
+            }
+
+            // Save the response to the ContractSolutions table
             ContractSolutions::create([
                 'file_name' => $fileName,
                 'doctype' => $doctype,
                 'data' => base64_encode($responseBody), // Store the binary data as a base64 encoded string
             ]);
 
-            return response()->json(['message' => 'File uploaded and response data saved successfully']);
+            // Create a new Word document if the response is not binary
+            if (strpos($contentType, 'application/json') !== false) {
+                $tempFilePath = $this->createWordDocument($responseText, $fileName);
+            } else {
+                $tempFilePath = tempnam(sys_get_temp_dir(), 'response') . '.docx';
+                file_put_contents($tempFilePath, $responseBody);
+            }
+
+            // Return the Word document as a download
+            return response()->download($tempFilePath, 'API_Response_' . $fileName . '.docx')->deleteFileAfterSend(true);
+
         } catch (RequestException $e) {
             $errorResponse = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+            Log::error("Failed to upload file: " . $errorResponse);
             return response()->json(['message' => 'Failed to upload file', 'error' => $errorResponse], $e->getCode() ?: 400);
         }
+    }
+
+    /**
+     * Check if the response is JSON and process it accordingly.
+     *
+     * @param string $responseBody
+     * @return string
+     */
+    private function processResponse($responseBody)
+    {
+        if ($this->isJson($responseBody)) {
+            return json_encode(json_decode($responseBody, true), JSON_PRETTY_PRINT);
+        }
+        return $responseBody;
+    }
+
+    /**
+     * Check if a given string is JSON.
+     *
+     * @param string $string
+     * @return bool
+     */
+    private function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    /**
+     * Create a Word document from the response text.
+     *
+     * @param string $responseText
+     * @param string $fileName
+     * @return string
+     */
+    private function createWordDocument($responseText, $fileName)
+    {
+        $phpWord = new PhpWord();
+        $section = $phpWord->addSection();
+        $section->addText('API Response:');
+        $section->addText($responseText);
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'response') . '.docx';
+        $writer = IOFactory::createWriter($phpWord, 'Word2007');
+        $writer->save($tempFilePath);
+
+        return $tempFilePath;
     }
 }
