@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\ContractAutomationSolutionController;
 use App\Http\Controllers\Api\VoiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -60,4 +61,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/getLatestNumber', [VoiceController::class, 'getLatestNumber']);
 
     Route::post('/uploadFile', [FileController::class, 'uploadFile']);
+
+    // Contract automation
+
+    Route::post('/contract-automation',[ContractAutomationSolutionController::class,'fetchContractAutomation']);
 });
