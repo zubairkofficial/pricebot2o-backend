@@ -21,14 +21,20 @@ class ServiceController extends Controller
             'name' => 'required',
             'description' => 'required',
             'link' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $service = new Service();
-        $service->name=$request->name;
-        $service->description=$request->description;
-        $service->link=$request->link;
+        $service->name = $request->name;
+        $service->description = $request->description;
+        $service->link = $request->link;
+        if ($request->hasFile('image')) {
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $service->image = $imageName;
+        }
         $service->save();
-        
+
         return response()->json([
             "message" => "Service Save Successfully",
             "service" => $service,
@@ -44,17 +50,28 @@ class ServiceController extends Controller
         $request->validate([
             'name' => 'required',
             'description' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $service = Service::findOrFail($id);
         $service->name=$request->name;
         $service->description=$request->description;
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($service->image && file_exists(public_path('images/' . $service->image))) {
+                unlink(public_path('images/' . $service->image));
+            }
+
+            $imageName = time() . '_' . uniqid() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $service->image = $imageName;
+        }
         $service->save();
 
         return response()->json(['message' => 'Service updated successfully', $service]);
     }
-    
-    
+
+
     public function updateSeriveStatus($id)
     {
         $service = Service::find($id);

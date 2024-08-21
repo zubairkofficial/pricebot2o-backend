@@ -213,7 +213,7 @@ class VoiceController extends Controller
 
         $TeilnehmerString = is_array($Teilnehmer) ? implode(', ', $Teilnehmer) : $Teilnehmer;
 
-        GeneratedNumber::create([
+        $generatedSummary = GeneratedNumber::create([
             // 'number' => $formattedNumber,
             'Thema' => $thema,
             'Datum' => $formattedDatum,
@@ -245,6 +245,7 @@ class VoiceController extends Controller
         }
 
         return response()->json([
+            'summary_id'=> $generatedSummary->id,
             'summary' => $summaryResponse,
             'json_summary' => $jsonResponse,
         ]);
@@ -318,8 +319,10 @@ class VoiceController extends Controller
         return response()->json(Organization::all(), 200);
     }
 
-    public function getLatestNumber()
+    public function getLatestNumber($summary_id)
     {
-        return response()->json(GeneratedNumber::latest()->first(), 200);
+
+        $latestData = GeneratedNumber::where('id',$summary_id)->first();
+        return response()->json($latestData, 200);
     }
 }

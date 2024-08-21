@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\ContractAutomationSolutionController;
+use App\Http\Controllers\Api\ToolController;
 use App\Http\Controllers\Api\VoiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,11 +59,17 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/sendResend', [VoiceController::class, 'sendResend']);
     Route::post('/generateSummary', [VoiceController::class, 'generateSummary']);
     Route::get('/getData', [VoiceController::class, 'getData']);
-    Route::get('/getLatestNumber', [VoiceController::class, 'getLatestNumber']);
+    Route::get('/getLatestNumber/{summary_id}', [VoiceController::class, 'getLatestNumber']);
 
     Route::post('/uploadFile', [FileController::class, 'uploadFile']);
 
     // Contract automation
+    Route::post('/contract-automation', [ContractAutomationSolutionController::class, 'fetchContractAutomation']);
 
-    Route::post('/contract-automation',[ContractAutomationSolutionController::class,'fetchContractAutomation']);
+    // Tool routes
+    // Route::get('/tools', [ToolController::class, 'index']);
+    // Route::post('/tools', [ToolController::class, 'store']);
+    // Route::get('/tools/{id}', [ToolController::class, 'show']);
+    // Route::put('/tools/{id}', [ToolController::class, 'update']);
+    // Route::delete('/tools/{id}', [ToolController::class, 'destroy']);
 });
