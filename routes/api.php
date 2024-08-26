@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\ContractAutomationSolutionController;
+use App\Http\Controllers\Api\DataProcessController;
 use App\Http\Controllers\Api\ToolController;
 use App\Http\Controllers\Api\VoiceController;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Contract automation
     Route::post('/contract-automation', [ContractAutomationSolutionController::class, 'fetchContractAutomation']);
 
+    // DataProcess
+    Route::post('/data-process',[DataProcessController::class,'fetchDataProcess']);
     // Tool routes
     // Route::get('/tools', [ToolController::class, 'index']);
     // Route::post('/tools', [ToolController::class, 'store']);
