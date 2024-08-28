@@ -109,7 +109,7 @@ class AuthController extends Controller
     public function updateUser(Request $request, $id)
     {
         $request->validate([
-            'services' => 'sometimes|array', 
+            'services' => 'sometimes|array',
         ]);
 
         $user = User::findOrFail($id);
@@ -157,4 +157,23 @@ class AuthController extends Controller
         return response()->json(['message' => 'User deleted successfully'], 200);
     }
 
+    public function getUserData()
+    {
+        // Get the currently authenticated user
+        $user = Auth::user();
+
+        // Check if user is authenticated
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Return the user's data with the send_email field
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'send_email' => $user->send_email,
+
+        ]);
+    }
 }

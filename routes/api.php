@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\ContractAutomationSolutionController;
 use App\Http\Controllers\Api\DataProcessController;
+use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ToolController;
 use App\Http\Controllers\Api\VoiceController;
 use Illuminate\Support\Facades\Route;
@@ -27,7 +28,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('updateUser/{id}', [AuthController::class, 'updateUser']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::delete('delete/{id}', [AuthController::class, 'delete']);
-
+    Route::get('/getUserData', [AuthController::class, 'getUserData']);
     Route::get('dashboardInfo', [AdminController::class, 'dashboardInfo']);
 
     // Service Routes
@@ -69,6 +70,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // DataProcess
     Route::post('/data-process',[DataProcessController::class,'fetchDataProcess']);
+
+    // logo setting
+
+    Route::post('/update-logo',[SettingController::class,'updateLogo']);
+    Route::get('/fetch-logo',[SettingController::class,'fetchLogo']);
+
     // Tool routes
     // Route::get('/tools', [ToolController::class, 'index']);
     // Route::post('/tools', [ToolController::class, 'store']);
