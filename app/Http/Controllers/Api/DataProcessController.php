@@ -7,121 +7,72 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
-use App\Models\DataProcess;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class DataProcessController extends Controller
 {
-
     public function fetchDataProcess(Request $request)
     {
+        set_time_limit(600);
 
-        set_time_limit(600); // 10 minutes
+        // Validate the request to ensure files are provided
         $validated = $request->validate([
-            'document' => 'required|file',
+            'documents' => 'required|array',
+            'documents.*' => 'file',
         ]);
 
-        $file = $request->file('document');
-        $fileName = $file->getClientOriginalName();
+        $responses = [];
 
-        $url = 'https://dhn.services/datasheet_process';
+        foreach ($request->file('documents') as $file) {
+            $fileName = $file->getClientOriginalName();
+            $url = 'https://dhn.services/datasheet_process';
 
-        $username = 'api_user';
-        $password = 'g*f>G31B=9D7';
+            $username = 'api_user';
+            $password = 'g*f>G31B=9D7';
 
-        $client = new Client([
-            'timeout' => 600,
-        ]);
-
-        try {
-            $startTime = microtime(true);
-
-            $response = $client->post($url, [
-                'auth' => [$username, $password],
-                'multipart' => [
-                    [
-                        'name'     => 'username',
-                        'contents' => $username,
-                    ],
-                    [
-                        'name'     => 'password',
-                        'contents' => $password,
-                    ],
-
-                    [
-                        'name'     => 'document',
-                        'contents' => fopen($file->getPathname(), 'r'),
-                        'filename' => $fileName,
-                    ],
-                ],
+            $client = new Client([
+                'timeout' => 600,
             ]);
 
-            $endTime = microtime(true);
+            try {
+                // Make the POST request with Basic Auth and multipart/form-data
+                $response = $client->post($url, [
+                    'auth' => [$username, $password],
+                    'multipart' => [
+                        [
+                            'name'     => 'username',
+                            'contents' => $username,
+                        ],
+                        [
+                            'name'     => 'password',
+                            'contents' => $password,
+                        ],
+                        [
+                            'name'     => 'document',
+                            'contents' => fopen($file->getPathname(), 'r'),
 
-            $responseBody = $response->getBody()->getContents();
-            $contentType = $response->getHeader('Content-Type')[0];
+                        ],
+                    ],
+                ]);
 
-            if (strpos($contentType, 'application/json') !== false) {
-                $responseText = json_decode($responseBody, true);
+                // Check the status code for success
+                if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                    // Get the response body
+                    $responseData = json_decode($response->getBody(), true);
 
-                $tempFilePath = $this->createExcelFile($responseText, $fileName);
-            } else {
+                    $responses[] =  $responseData;
+                } else {
+                    return response()->json(['message' => 'Failed to upload file', 'error' => 'Unexpected status code'], $response->getStatusCode());
+                }
 
-                $tempFilePath = tempnam(sys_get_temp_dir(), 'response') . '.xlsx';
-                file_put_contents($tempFilePath, $responseBody);
+
+            } catch (RequestException $e) {
+                // Handle the error response
+                $errorResponse = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+                return response()->json(['message' => 'Failed to upload file', 'error' => $errorResponse], $e->getCode() ?: 400);
             }
-
-            DataProcess::create([
-                'file_name' => $fileName,
-                'data' => base64_encode($responseBody),
-            ]);
-
-            return response()->download($tempFilePath, 'API_Response_' . pathinfo($fileName, PATHINFO_FILENAME) . '.xlsx')->deleteFileAfterSend(true);
-        } catch (RequestException $e) {
-            $errorResponse = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
-            return response()->json(['message' => 'Failed to upload file', 'error' => $errorResponse], $e->getCode() ?: 400);
-        }
-    }
-
-    private function createExcelFile($responseText, $fileName)
-    {
-
-
-        if (isset($responseText['response'])) {
-            $responseText = json_decode($responseText['response'], true);
         }
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $columnIndex = 'B';
-
-        $rowIndex = 1;
-
-        $sheet->setCellValue('A' . $rowIndex, 'SR_No');
-        $sheet->getStyle('A' . $rowIndex)->getFont()->setBold(true);
-
-        $sheet->setCellValue('A' . ($rowIndex + 1), '1');
-
-        foreach ($responseText as $key => $value) {
-
-            $sheet->setCellValue($columnIndex . $rowIndex, $key);
-            $sheet->getStyle($columnIndex . $rowIndex)->getFont()->setBold(true);
-
-            if (is_array($value)) {
-                $sheet->setCellValue($columnIndex . ($rowIndex + 1), implode(', ', $value)); // Handle arrays by joining with a comma
-            } else {
-                $sheet->setCellValue($columnIndex . ($rowIndex + 1), $value);
-            }
-
-            $columnIndex++;
-        }
-
-        $tempFilePath = tempnam(sys_get_temp_dir(), 'response') . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($tempFilePath);
-
-        return $tempFilePath;
+        // Return a successful response with the combined data
+        return response()->json(['message' => 'Files processed successfully', 'data' => $responses]);
     }
 }
