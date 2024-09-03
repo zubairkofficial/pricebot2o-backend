@@ -49,7 +49,7 @@ class DataProcessController extends Controller
                         [
                             'name'     => 'document',
                             'contents' => fopen($file->getPathname(), 'r'),
-
+                            'filename' => $fileName
                         ],
                     ],
                 ]);
@@ -63,8 +63,6 @@ class DataProcessController extends Controller
                 } else {
                     return response()->json(['message' => 'Failed to upload file', 'error' => 'Unexpected status code'], $response->getStatusCode());
                 }
-
-
             } catch (RequestException $e) {
                 // Handle the error response
                 $errorResponse = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
