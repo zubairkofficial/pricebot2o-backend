@@ -19,19 +19,18 @@ class OrganizationController extends Controller
     public function addOrg(Request $request){
         $request->validate([
             'name' => 'required',
-            'number' => 'required',
-            'street' => 'required',
+            'prompt' => 'required',
+
         ]);
 
         $org = new Organization();
         $org->name=$request->name;
-        $org->number=$request->number;
-        $org->street=$request->street;
+
         if($request->prompt){
             $org->prompt=$request->prompt;
         }
         $org->save();
-        
+
         return response()->json([
             "message" => "Organization Save Successfully",
             "org" => $org,
@@ -46,21 +45,18 @@ class OrganizationController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'number' => 'required',
-            'street' => 'required',
+            'prompt' => 'required',
         ]);
 
         $org = Organization::findOrFail($id);
         $org->name=$request->name;
-        $org->number=$request->number;
-        $org->street=$request->street;
         $org->prompt=$request->prompt;
         $org->save();
 
         return response()->json(['message' => 'Organization updated successfully', $org]);
     }
-    
-    
+
+
     public function updateOrgStatus($id)
     {
         $org = Organization::find($id);

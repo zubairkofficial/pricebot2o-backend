@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('free_data_processes', function (Blueprint $table) {
             $table->id();
             $table->string('file_name'); // Column for the file name
-            $table->json('data')->nullable(); // Column to store any JSON data from API response
+            $table->longText('data')->nullable();
             $table->unsignedBigInteger('user_id')->nullable(); // Add user_id column
             $table->timestamps();
 
@@ -28,11 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('documents', function (Blueprint $table) {
-            $table->dropForeign(['user_id']); // Drop the foreign key constraint
-            $table->dropColumn('user_id'); // Drop the user_id column
-        });
-
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('free_data_processes');
     }
 };

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('user_type')->default(0);
             $table->json('services')->nullable();
             $table->string('org_id')->nullable();
+            $table->boolean('is_user_organizational')->nullable();
+        
             $table->rememberToken();
             $table->timestamps();
         });

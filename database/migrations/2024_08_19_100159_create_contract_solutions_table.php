@@ -16,7 +16,11 @@ return new class extends Migration
             $table->string('doctype');
             $table->string('file_name'); // Column for the file name
             $table->longText('data')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable(); // Add user_id column
             $table->timestamps();
+
+            // Set foreign key constraint
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -25,6 +29,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('contract_solutions', function (Blueprint $table) {
+            $table->dropForeign(['user_id']); // Drop the foreign key constraint
+            $table->dropColumn('user_id'); // Drop the user_id column
+        });
+
         Schema::dropIfExists('contract_solutions');
     }
 };

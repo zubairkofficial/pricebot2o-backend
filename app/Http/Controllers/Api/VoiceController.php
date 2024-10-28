@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-use App\Models\{Email, Organization, GeneratedNumber};
+use App\Models\{Email, ApiKey, Organization, GeneratedNumber};
 
 
 class VoiceController extends Controller
@@ -24,7 +24,7 @@ class VoiceController extends Controller
         $apiKey = env('CHAT_GPT_KEY');
         $model = env('CHAT_GPT_MODEL');
 
-        $deepgramapi = env('DEEPGRAM_KEY');
+        $deepgramapi = ApiKey::where('name','Deepgram')->select('key')->first()->key;;
 
         $user_id = Auth::user()->id;
 
@@ -59,8 +59,9 @@ class VoiceController extends Controller
     public function generateSummary(Request $request)
     {
         $transcriptionText = $request->input('recordedText');
-        $apiKey = env('CHAT_GPT_KEY');
-        $model = env('CHAT_GPT_MODEL');
+        $apiKey = ApiKey::where('name','OpenAI')->select('key')->first()->key;
+
+
 
 
         $user_id = Auth::user()->id;
@@ -121,10 +122,14 @@ class VoiceController extends Controller
             $summaryResponse = $body['choices'][0]['text'] ?? 'Zusammenfassung konnte nicht generiert werden';
         } catch (\Exception $e) {
             Log::error("OpenAI GPT-3.5 Summary Request Failed: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => " OpenAI API Request Failed. "
+            ], 500);
         }
 
         // Method 2: Generating structured JSON
-        $jsonModel = 'gpt-4-turbo';
+        $jsonModel = 'gpt-4o';
         $jsonPrompt = " Wir haben eine deutsche Transkription aus einer aufgezeichneten Audiodatei, die wir zusammenfassen müssen.
         Beispiel für eine Audio-Transkription
         $transcriptionText.

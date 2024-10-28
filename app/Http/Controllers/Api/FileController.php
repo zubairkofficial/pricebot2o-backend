@@ -23,9 +23,12 @@ class FileController extends Controller
         // Retrieve the uploaded file and file name
         $file = $request->file('document');
         $fileName = $request->input('fileName');
+        $userId = $request-> input(key: 'user_id');
+
+        Log::info("USER ID ", [$userId]);
 
         // API URL
-        $url = 'https://dhn.services/sthamer/datasheet_process';
+        $url = 'http://20.218.155.138/sthamer/datasheet_process';
 
         // Static credentials
         $username = 'api_user';
@@ -63,8 +66,8 @@ class FileController extends Controller
                 // Save the file data and file name to the database
                 Document::create([
                     'file_name' => $fileName,
-                    'data' => json_encode($responseData), // Ensure data is encoded if it's JSON
-
+                    'data' => json_encode($responseData),
+                    'user_id'=> $userId                // Ensure data is encoded if it's JSON
                 ]);
 
                 // Return a successful response with the data

@@ -19,7 +19,7 @@ class SettingController extends Controller
         ]);
 
         $user = Auth::user();
-        $logoSetting = LogoSetting::firstOrCreate(['user_id' => $user->id]);
+        $logoSetting = LogoSetting::firstOrCreate(attributes: ['user_id' => $user->id]);
 
         if ($request->hasFile('logo')) {
             // Delete the old logo if it exists

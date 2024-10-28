@@ -17,6 +17,7 @@ class Document extends Model
     protected $fillable = [
         'file_name',
         'data',
+        'user_id'
     ];
 
     /**
@@ -27,4 +28,8 @@ class Document extends Model
     protected $casts = [
         'data' => 'array',
     ];
+
+    public function Documents(){
+        return $this->belongsTo(User::class , 'id');
+    }
 }

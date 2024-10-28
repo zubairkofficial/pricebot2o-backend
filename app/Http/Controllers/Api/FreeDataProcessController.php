@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DataProcess;
+use App\Models\FreeDataProcess;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
-class DataProcessController extends Controller
+class FreeDataProcessController extends Controller
 {
-    public function fetchDataProcess(Request $request)
+    public function fetchFreeDataProcess(Request $request)
     {
         set_time_limit(600);
 
@@ -25,8 +26,7 @@ class DataProcessController extends Controller
 
         foreach ($request->file('documents') as $file) {
             $fileName = $file->getClientOriginalName();
-            $url = 'http://20.218.155.138/datasheet_process';
-
+            $url = 'http://20.218.155.138/free_datasheet_process';
 
             $username = 'api_user';
             $password = 'g*f>G31B=9D7';
@@ -61,7 +61,7 @@ class DataProcessController extends Controller
                     // Get the response body
                     $responseData = json_decode($response->getBody(), true);
 
-                    DataProcess::create([
+                    FreeDataProcess::create([
                         'file_name' => $fileName,
                         'data' => base64_encode(json_encode($responseData)),
                         'user_id'=> $userId,

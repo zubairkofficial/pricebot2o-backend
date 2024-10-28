@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class DataProcess extends Model
 {
     use HasFactory;
-    protected $fillable = ['file_name', 'data'];
-
+    protected $fillable = ['file_name', 'data', 'user_id'];
+    public function DataProcess(){
+        return $this->belongsTo(User::class , 'id');
+    }
 }

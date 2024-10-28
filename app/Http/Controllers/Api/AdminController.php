@@ -22,4 +22,6 @@ class AdminController extends Controller
         return response()->json(['users'=>$users], 200);
     }
 
+    
+
 }
