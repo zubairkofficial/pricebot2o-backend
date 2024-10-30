@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
+use App\Mail\ProcessedFileMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\File;
 
 class DataProcessController extends Controller
 {
@@ -64,7 +67,7 @@ class DataProcessController extends Controller
                     DataProcess::create([
                         'file_name' => $fileName,
                         'data' => base64_encode(json_encode($responseData)),
-                        'user_id'=> $userId,
+                        'user_id' => $userId,
                     ]);
 
                     $responses[] =  $responseData;
@@ -79,5 +82,33 @@ class DataProcessController extends Controller
         }
         // Return a successful response with the combined data
         return response()->json(['message' => 'Files processed successfully', 'data' => $responses]);
+    }
+    
+    public function sendProcessedFile(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx'
+        ]);
+        // Get the uploaded file
+        $file = $request->file('file');
+
+        $filePath = public_path('Processed_Files_Data.xlsx'); // Define your desired file name
+        $file->move(public_path(), 'Processed_Files_Data.xlsx'); // Save the file in public directory
+
+        if (!file_exists($filePath)) {
+            return response()->json(['error' => 'File could not be saved.'], 500);
+        }
+        $user = auth()->user();
+
+
+        try {
+            Mail::to($user->email)->send(new ProcessedFileMail($filePath, $user));
+            File::delete($filePath); 
+        } catch (\Exception $e) {
+            Log::error('Failed to send email: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to send email.'], 500);
+        }
+
+        return response()->json(['message' => 'E-Mail erfolgreich gesendet.']);
     }
 }

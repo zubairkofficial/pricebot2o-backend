@@ -104,6 +104,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // DataProcess
     Route::post('/data-process', [DataProcessController::class, 'fetchDataProcess']);
+    Route::post('/send-processed-file', [DataProcessController::class, 'sendProcessedFile']);
     Route::post('/freeDataProcess', [FreeDataProcessController::class, 'fetchFreeDataProcess']);
 
     // logo setting

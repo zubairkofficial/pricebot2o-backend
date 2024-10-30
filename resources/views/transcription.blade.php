@@ -10,7 +10,7 @@
 <body>
     <h1>Transkriptions-E-Mail</h1>
 
-    <img src="https://pricebot.martinmobiles.com/assets/logo.jpeg" alt="Profilbild" style="width: 100px; height: 100px; border-radius: 50%;">
+    <img src="https://dhnapi.cyberifyportfolio.com/assets/logo.png" alt="Profilbild" style="width: 100px; height: 100px; border-radius: 50%;">
 
     @if(isset($data['transcriptionText']))
     <p>Hier ist der Transkriptionstext:</p>

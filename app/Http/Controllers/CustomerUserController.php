@@ -91,7 +91,7 @@ class CustomerUserController extends Controller
         'name' => 'required',
         'email' => 'required|email|unique:users',
         'password' => 'required|min:8',
-        'org_id' => 'required',
+        // 'org_id' => 'required',
         'services' => 'nullable|array',
         'is_user_organizational' => 'nullable|boolean',
     ], [
@@ -104,7 +104,7 @@ class CustomerUserController extends Controller
         'password.required' => 'Das Passwort ist erforderlich.',
         'password.min' => 'Das Passwort muss mindestens 8 Zeichen lang sein.',
 
-        'org_id.required' => 'Die Organisations-ID ist erforderlich.',
+        // 'org_id.required' => 'Die Organisations-ID ist erforderlich.',
 
         'services.array' => 'Die Dienste müssen ein Array sein.',
 
