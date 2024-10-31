@@ -24,7 +24,7 @@ class CustomerUserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8',
             'services' => 'nullable|array',
-            'org_id' => 'required',
+            // 'org_id' => 'required',
             'is_user_organizational' => 'nullable|boolean',
             'organizational_user_id' => 'exists:users,id', // Ensure that the organizational user ID exists in the users table
         ], [
@@ -39,7 +39,7 @@ class CustomerUserController extends Controller
 
             'services.array' => 'Die Dienste müssen ein Array sein.',
 
-            'org_id.required' => 'Die Organisations-ID ist erforderlich.',
+            // 'org_id.required' => 'Die Organisations-ID ist erforderlich.',
 
             'is_user_organizational.boolean' => 'Der Organisationsstatus muss ein boolescher Wert sein.',
 
